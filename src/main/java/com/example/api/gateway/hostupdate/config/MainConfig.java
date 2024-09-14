@@ -17,10 +17,10 @@ public class MainConfig {
         return builder.routes()
                 .route("custom-route-1", r -> r.path("/red")
                         .filters(f ->
-                            f.rewritePath("/red", "/blue")  // to update uri
+                            f.filter(requestFilter)
+                                    .rewritePath("/red", "/blue")
                                     .filter(hostFilter.apply(
-                                            new HostFilter.Config()))
-                                    .filter(requestFilter)
+                                            new HostFilter.Config()))// to update uri
                         )
                         .uri("http://dummyhost.xyz.com")) // the dummy destination host that will be overridden
                 .build();

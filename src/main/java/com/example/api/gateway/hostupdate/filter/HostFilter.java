@@ -3,6 +3,8 @@ package com.example.api.gateway.hostupdate.filter;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.route.Route;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -13,6 +15,7 @@ import java.net.URI;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> {
 
     String domain = "localhost";//".xyz.com";
@@ -20,7 +23,7 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            System.out.println("hello");
+            System.out.println("Applying HostName filter");
             ServerHttpRequest request = exchange.getRequest();
             String incomingHost = request.getURI().getHost();;
             String location = request.getQueryParams().getFirst("locality");
@@ -32,11 +35,11 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
                             .host(updatedHost)
                             .port(8080)
                             .build().toUri();
-//            ServerHttpRequest updatedReq = request.mutate().uri(updatedUri).build();
 
             ServerWebExchange modifiedExchange = modifyExchange(exchange, updatedUri);
             System.out.println("updatedUri:"+updatedUri);
             System.out.println("updatedHost:"+updatedHost);
+            System.out.println("Applying HostName filter completed.. ");
             return chain.filter(modifiedExchange);
         };
     }
@@ -44,6 +47,8 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
     private ServerWebExchange modifyExchange(ServerWebExchange exchange, URI updatedUri ) {
         ServerWebExchange modifiedExchange = exchange.mutate().build();
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+
+        // create new Route object based on old route and updatedURI
         Route newRoute = Route.async()
                 .id(route.getId())
                 .uri(updatedUri)
