@@ -1,4 +1,4 @@
-package com.example.api_gateway_update_host_filter;
+package com.example.api.gateway.hostupdate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
