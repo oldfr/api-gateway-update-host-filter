@@ -13,16 +13,18 @@ public class MainConfig {
     @Bean
     public RouteLocator routes(
             RouteLocatorBuilder builder,
-            HostFilter hostFilter, RequestFilter requestFilter) {
+            HostFilter hostFilter,
+            RequestFilter requestFilter) {
         return builder.routes()
-                .route("custom-route-1", r -> r.path("/red")
-                        .filters(f ->
-                            f.filter(requestFilter)
-                                    .rewritePath("/red", "/blue")
-                                    .filter(hostFilter.apply(
-                                            new HostFilter.Config()))// to update uri
-                        )
-                        .uri("http://dummyhost.xyz.com")) // the dummy destination host that will be overridden
+                .route("custom-route-1",
+                        r -> r.path("/red")
+                                .filters(f ->
+                                        f.filter(requestFilter)
+                                                .rewritePath("/red", "/blue") // only if we want to update endpoint
+                                                .filter(hostFilter.apply(
+                                                        new HostFilter.Config()))// to update uri
+                                )
+                                .uri("http://dummyhost.xyz.com")) // the dummy destination host that will be overridden by HostFilter
                 .build();
     }
 }

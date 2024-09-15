@@ -18,7 +18,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> {
 
-    String domain = "localhost";//".xyz.com";
+    String domain = "localhost"; //provide domain name here. e.g: ".xyz.com";
 
     @Override
     public GatewayFilter apply(Config config) {
@@ -31,9 +31,9 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
 
             URI updatedUri =
                     UriComponentsBuilder.fromUri(exchange.getRequest().getURI())
-                            .scheme("http")
+                            .scheme("http") // provide scheme of host
                             .host(updatedHost)
-                            .port(8080)
+                            .port(8080) // replace with respective port
                             .build().toUri();
 
             ServerWebExchange modifiedExchange = modifyExchange(exchange, updatedUri);
