@@ -3,22 +3,21 @@ package com.example.api.gateway.hostupdate.filter;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.route.Route;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> {
 
-    String domain = "localhost"; //provide domain name here. e.g: ".xyz.com";
+    String domain = ".nothing.com"; //replace with your domain name here
 
     @Override
     public GatewayFilter apply(Config config) {
@@ -27,7 +26,14 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
             ServerHttpRequest request = exchange.getRequest();
             String incomingHost = request.getURI().getHost();;
             String location = request.getQueryParams().getFirst("locality");
-            String updatedHost = incomingHost.replace(domain, location+domain);
+            if(request.getURI().getPath().equals("/green")) {
+                Map<String, String> body = exchange.getAttribute("cachedRequestBodyObject");
+                System.out.println("read body:"+body);
+                    location = Objects.nonNull(body) && body.containsKey("location") ? body.get("location") : "USA";
+
+            }
+            System.out.println("location:"+location);
+            String updatedHost = location + "service"+domain;
 
             URI updatedUri =
                     UriComponentsBuilder.fromUri(exchange.getRequest().getURI())
