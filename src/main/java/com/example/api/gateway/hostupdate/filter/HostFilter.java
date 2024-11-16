@@ -18,7 +18,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> {
 
-    String domain = "localhost"; //provide domain name here. e.g: ".xyz.com";
+    String domain = ".nothing.com"; //provide domain name here
 
     @Override
     public GatewayFilter apply(Config config) {
@@ -36,7 +36,7 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
                             .port(8080) // replace with respective port
                             .build().toUri();
 
-            ServerWebExchange modifiedExchange = modifyExchange(exchange, updatedUri);
+            ServerWebExchange modifiedExchange = updateExchange(exchange, updatedUri);
             System.out.println("updatedUri:"+updatedUri);
             System.out.println("updatedHost:"+updatedHost);
             System.out.println("Applying HostName filter completed.. ");
@@ -44,7 +44,7 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
         };
     }
 
-    private ServerWebExchange modifyExchange(ServerWebExchange exchange, URI updatedUri ) {
+    private ServerWebExchange updateExchange(ServerWebExchange exchange, URI updatedUri ) {
         ServerWebExchange modifiedExchange = exchange.mutate().build();
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
 
@@ -57,7 +57,9 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
 
         newRoute.getPredicate().apply(exchange);
 
-        modifiedExchange.getAttributes().put(GATEWAY_ROUTE_ATTR,newRoute); // This step is mandatory as GATEWAY_ROUTE_ATTR will only be set once when gateway property is set. To update host, you need to update this attribute
+        // This step is mandatory as GATEWAY_ROUTE_ATTR will only be set once when gateway property is set.
+        // To update host, you need to update this attribute
+        modifiedExchange.getAttributes().put(GATEWAY_ROUTE_ATTR,newRoute);
 
         System.out.println("returning modifiedExchange");
         return modifiedExchange;
