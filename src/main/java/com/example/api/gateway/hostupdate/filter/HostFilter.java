@@ -27,7 +27,7 @@ public class HostFilter extends AbstractGatewayFilterFactory<HostFilter.Config> 
             ServerHttpRequest request = exchange.getRequest();
             String incomingHost = request.getURI().getHost();;
             String location = request.getQueryParams().getFirst("locality");
-            String updatedHost = incomingHost.replace(domain, location+domain);
+            String updatedHost = incomingHost.replace(domain, location+"service"+domain);
 
             URI updatedUri =
                     UriComponentsBuilder.fromUri(exchange.getRequest().getURI())
